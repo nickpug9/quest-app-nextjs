@@ -1,4 +1,5 @@
 import db from "./db";
+import { Task } from "../models/task";
 
 export async function createTask(
   questId: number,
@@ -7,10 +8,24 @@ export async function createTask(
   status: string,
   value: number
 ) {
-  const taskId = await db
-    .table("tasks")
-    .add({ questId, title, description, status, value });
-  return taskId;
+  try {
+    const taskResult = await db
+      .table("tasks")
+      .add({ questId, title, description, status, value });
+    console.dir(taskResult);
+    const taskId = taskResult;
+    const newTask: Task = {
+      id: taskId,
+      questId,
+      title,
+      description,
+      status,
+      value,
+    };
+    return newTask;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 export async function getTasksForQuests(questId: number) {
