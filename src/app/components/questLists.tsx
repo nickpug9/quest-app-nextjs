@@ -26,13 +26,6 @@ const QuestLists = () => {
   };
 
   const handleAddTask = async () => {
-    // const newTask: Task = {
-    //     id: new Date().getTime(),
-    //     title: newTaskTitle,
-    //     description: newTaskDescription,
-    //     status: newTaskStatus,
-    //     value: newTaskValue
-    // }
     try {
       // Add task to the quest
       const addedTask = await createTask(
@@ -120,7 +113,10 @@ const QuestLists = () => {
           onChange={(e) => setQuestTitle(e.target.value)}
           className="text-black"
         />
-        <button className="text-black" onClick={handleAddQuest}>
+        <button
+          className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={handleAddQuest}
+        >
           Add Quest
         </button>
       </div>
@@ -133,19 +129,23 @@ const QuestLists = () => {
           {quests.map((quest) => (
             <div
               key={quest.id}
-              className="quest-item bg-slate-50 text-sky-900 my-2 p-1"
+              className="quest-item bg-slate-50 text-sky-900 my-2 flex flex-col rounded-lg"
             >
-              <h2 className="font-bold">{quest.title}</h2>
-              <span>
-                <button
-                  onClick={() => {
-                    setShowAddTaskForm(true);
-                    setCurrentQuestId(quest.id);
-                  }}
-                >
-                  Add Task
-                </button>
-              </span>
+              <h2 className="text-xl font-bold border-2	 rounded-lg border-slate-300 p-2 bg-orange-100 flex justify-between align-middle">
+                {quest.title}{" "}
+                <span>
+                  {" "}
+                  <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded content-center	m-auto"
+                    onClick={() => {
+                      setShowAddTaskForm(true);
+                      setCurrentQuestId(quest.id);
+                    }}
+                  >
+                    +
+                  </button>
+                </span>
+              </h2>
               {showAddTaskForm && currentQuestId === quest.id && (
                 <div>
                   <input
@@ -167,8 +167,15 @@ const QuestLists = () => {
                       setNewTaskValue(parseInt(e.target.value, 10))
                     }
                   />
-                  <button onClick={handleAddTask}>Add Task</button>
-                  <button onClick={handleCancelAddTask}>Cancel Task</button>
+                  <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded content-center"
+                    onClick={handleAddTask}
+                  >
+                    Add Task
+                  </button>
+                  <button className="btn btn-red" onClick={handleCancelAddTask}>
+                    Cancel Task
+                  </button>
                 </div>
               )}
               {quest.tasks.length > 0 ? (
