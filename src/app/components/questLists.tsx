@@ -1,10 +1,16 @@
 "use client"; // This is a client component 👈🏽
 
 import { useState, useEffect } from "react";
+import { IndexableType } from "dexie";
 
 import { createQuest, getQuests } from "../utils/questService";
-import { createTask, getTasksForQuests } from "../utils/taskService";
+import {
+  createTask,
+  getTasksForQuests,
+  deleteTask,
+} from "../utils/taskService";
 import { Quest } from "../models/quest";
+import { Task } from "../models/task";
 import TaskItem from "../components/taskItem";
 
 const QuestLists = () => {
@@ -75,6 +81,18 @@ const QuestLists = () => {
     setNewTaskValue(1);
   };
 
+  const handleDeleteTask = (taskId: IndexableType) => {
+    deleteTask(taskId);
+
+    const updatedQuests = quests.map((quest) => {
+      return {
+        ...quest,
+        tasks: quest.tasks?.filter((task) => task.id !== taskId) ?? [],
+      };
+    });
+    setQuests(updatedQuests);
+  };
+
   useEffect(() => {
     const fetchQuests = async () => {
       const fetchedQuests = await getQuests();
@@ -94,6 +112,7 @@ const QuestLists = () => {
           })
         );
         setQuests(questsWithTasks);
+        // setQuestTasks(tasks);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching quests and tasks:", error);
@@ -132,20 +151,21 @@ const QuestLists = () => {
               className="quest-item bg-slate-50 text-sky-900 my-2 flex flex-col rounded-lg"
             >
               <h2 className="text-xl font-bold border-2	 rounded-lg border-slate-300 p-2 bg-orange-100 flex justify-between align-middle">
-                {quest.title}{" "}
-                <span>
-                  {" "}
-                  <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded content-center	m-auto"
-                    onClick={() => {
-                      setShowAddTaskForm(true);
-                      setCurrentQuestId(quest.id);
-                    }}
-                  >
-                    +
-                  </button>
-                </span>
+                {quest.title} <span className="flex justify-between p-1"></span>
               </h2>
+
+              {quest.tasks.length > 0 ? (
+                quest.tasks.map((task) => (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    tasks={quest.tasks}
+                    onDelete={handleDeleteTask}
+                  />
+                ))
+              ) : (
+                <p className="p-1">No tasks for this quest</p>
+              )}
               {showAddTaskForm && currentQuestId === quest.id && (
                 <div>
                   <input
@@ -168,23 +188,28 @@ const QuestLists = () => {
                     }
                   />
                   <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded content-center"
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 mb-1 rounded content-center"
                     onClick={handleAddTask}
                   >
                     Add Task
                   </button>
-                  <button className="btn btn-red" onClick={handleCancelAddTask}>
-                    Cancel Task
+                  <button
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-1 mx-1 mb-1 rounded content-center"
+                    onClick={handleCancelAddTask}
+                  >
+                    Cancel
                   </button>
                 </div>
               )}
-              {quest.tasks.length > 0 ? (
-                quest.tasks.map((task) => (
-                  <TaskItem key={task.id} task={task} />
-                ))
-              ) : (
-                <p>No tasks for this quest</p>
-              )}
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-2 rounded content-center	m-auto w-full"
+                onClick={() => {
+                  setShowAddTaskForm(true);
+                  setCurrentQuestId(quest.id);
+                }}
+              >
+                Add Task +
+              </button>
             </div>
           ))}
         </div>
