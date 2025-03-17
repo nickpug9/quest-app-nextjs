@@ -8,6 +8,12 @@ export async function createQuest(title: string, description: string) {
   return questId;
 }
 
+export async function deleteQuest(id: number) {
+  const deleted = await db.table("quests").delete(id);
+  console.log(db.table("quests").toArray());
+  return deleted;
+}
+
 export async function getQuests() {
   return await db.table("quests").toArray();
 }

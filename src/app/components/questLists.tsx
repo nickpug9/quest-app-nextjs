@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { IndexableType } from "dexie";
 
-import { createQuest, getQuests } from "../utils/questService";
+import { createQuest, deleteQuest, getQuests } from "../utils/questService";
 import {
   createTask,
   getTasksForQuests,
@@ -12,6 +12,7 @@ import {
 import { Quest } from "../models/quest";
 import { Task } from "../models/task";
 import TaskItem from "../components/taskItem";
+import { Background } from "./background";
 
 const QuestLists = () => {
   const [questTitle, setQuestTitle] = useState("");
@@ -29,7 +30,33 @@ const QuestLists = () => {
   const handleAddQuest = async () => {
     const newQuestId = await createQuest(questTitle, "");
     setQuestId(parseInt(newQuestId, 10));
+    // const updatedQuests = quests?.push(newQuestId);
+    setQuests(prevQuests => [
+        ...prevQuests,
+      {
+        id: newQuestId,
+        title: questTitle,
+        description: "",
+        tasks: []
+      }
+    ]);
   };
+// REVIEW THIS FUNCTION
+  const handleDeleteQuest = async (Qid: number) => {
+    console.log("Delete task: ", Qid);
+     deleteQuest(Qid);
+
+    // const updatedQuests = quests.map((quest) => {
+    //   return {
+    //     ...quest,
+    //   };
+    // });
+
+    const updatedQuests = quests?.filter((quest) => quest.id !== Qid) ?? [];
+    console.log(updatedQuests);
+    setQuests(updatedQuests);
+
+  }
 
   const handleAddTask = async () => {
     try {
@@ -50,6 +77,8 @@ const QuestLists = () => {
             (quest) => quest.id === currentQuestId
           );
           if (questIndex !== -1) {
+            console.log("quest index: ", questIndex);
+            console.log()
             updatedQuests[questIndex] = {
               ...updatedQuests[questIndex],
               tasks: [...updatedQuests[questIndex].tasks, addedTask],
@@ -87,9 +116,10 @@ const QuestLists = () => {
     const updatedQuests = quests.map((quest) => {
       return {
         ...quest,
-        tasks: quest.tasks?.filter((task) => task.id !== taskId) ?? [],
+        tasks: quest.tasks.filter((task) => task.id !== taskId) ?? [],
       };
     });
+
     setQuests(updatedQuests);
   };
 
@@ -145,20 +175,27 @@ const QuestLists = () => {
         <p>{error}</p>
       ) : (
         <div>
-          {quests.map((quest) => (
+          {quests.map((quest, el) => (
             <div
               key={quest.id}
               className="quest-item bg-slate-50 text-sky-900 my-2 flex flex-col rounded-lg"
             >
-              <h2 className="text-xl font-bold border-2	 rounded-lg border-slate-300 p-2 bg-orange-100 flex justify-between align-middle">
+              <div className="text-xl font-bold border-2	 rounded-lg border-slate-300 px-1 py-2 bg-orange-100 flex justify-between align-middle">
+              <h2 >
                 {quest.title} <span className="flex justify-between p-1"></span>
               </h2>
-
+                <button
+                    className=" bg-red-500 hover:bg-red-700 text-white font-bold py-0 px-2 rounded"
+                    onClick={() => handleDeleteQuest(quest.id)}
+                >
+                  x
+                </button>
+              </div>
               {quest.tasks.length > 0 ? (
-                quest.tasks.map((task) => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
+                  quest.tasks.map((task) => (
+                      <TaskItem
+                          key={task.id}
+                          task={task}
                     tasks={quest.tasks}
                     onDelete={handleDeleteTask}
                   />
