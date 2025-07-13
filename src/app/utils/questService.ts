@@ -8,7 +8,7 @@ export async function createQuest(title: string, description: string) {
   return questId;
 }
 
-export async function deleteQuest(id: number) {
+export async function deleteQuest(id: string) {
   const deleted = await db.table("quests").delete(id);
   console.log(db.table("quests").toArray());
   return deleted;

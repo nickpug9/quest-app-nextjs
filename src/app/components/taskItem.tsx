@@ -1,11 +1,11 @@
-import { IndexableType } from "dexie";
+// import { IndexableType } from "dexie";
 import { Task } from "../models/task";
 const TaskItem = ({
   task,
   onDelete,
 }: {
   task: Task;
-  onDelete: (taskId: IndexableType) => void;
+  onDelete: (taskId: string) => void;
   tasks: Task[];
 }) => {
   return (

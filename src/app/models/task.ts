@@ -1,8 +1,8 @@
-import { IndexableType } from "dexie";
+// import { IndexableType } from "dexie";
 
 export interface Task {
-  id: IndexableType;
-  questId: number;
+  id: string;
+  questId: string;
   title: string;
   description?: string;
   status: string;

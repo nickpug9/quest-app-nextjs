@@ -1,20 +1,22 @@
 import db from "./db";
 import { Task } from "../models/task";
-import { IndexableType } from "dexie";
+// import { IndexableType } from "dexie";
+import { v4 as uuidv4 } from "uuid";
 
 export async function createTask(
-  questId: number,
+  questId: string,
   title: string,
   description: string,
   status: string,
   value: number
 ) {
   try {
+    const taskId = uuidv4();
+
     const taskResult = await db
       .table("tasks")
-      .add({ questId, title, description, status, value });
+      .add({ id: taskId, questId, title, description, status, value });
     console.dir(taskResult);
-    const taskId = taskResult;
     const newTask: Task = {
       id: taskId,
       questId,
@@ -29,11 +31,11 @@ export async function createTask(
   }
 }
 
-export async function getTasksForQuests(questId: number) {
+export async function getTasksForQuests(questId: string) {
   return await db.table("tasks").where("questId").equals(questId).toArray();
 }
 
-export async function deleteTask(id: IndexableType) {
+export async function deleteTask(id: string) {
   return await db
     .table("tasks")
     .where("id")

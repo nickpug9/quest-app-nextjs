@@ -1,7 +1,7 @@
 import { Task } from "../models/task";
-import {IndexableType} from "dexie";
+// import {IndexableType} from "dexie";
 export interface Quest {
-  id: IndexableType;
+  id: string;
   title: string;
   description?: string;
   tasks: Task[];
