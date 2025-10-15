@@ -1,4 +1,4 @@
-"use client"; // This is a client component 👈🏽
+"use client";
 
 import { useState, useEffect } from "react";
 // import { IndexableType } from "dexie";
@@ -9,10 +9,11 @@ import {
   getTasksForQuests,
   deleteTask,
 } from "../utils/taskService";
-import { Quest } from "../models/quest";
+import Quest from "../models/quest";
 // import { Task } from "../models/task";
 import TaskItem from "../components/taskItem";
 // import { Background } from "./background";
+import { updateTaskStatus } from "../utils/taskService";
 
 const QuestLists = () => {
   const [questTitle, setQuestTitle] = useState("");
@@ -22,6 +23,7 @@ const QuestLists = () => {
   const [error, setError] = useState<string | null>(null);
   const [showAddTaskForm, setShowAddTaskForm] = useState(false);
   const [currentQuestId, setCurrentQuestId] = useState<string>("");
+  const [currentParentId] = useState<string>("");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newTaskStatus, setNewTaskStatus] = useState("Active");
@@ -63,6 +65,7 @@ const QuestLists = () => {
       // Add task to the quest
       const addedTask = await createTask(
         currentQuestId!,
+        currentParentId,
         newTaskTitle,
         newTaskDescription,
         newTaskStatus,
@@ -152,7 +155,22 @@ const QuestLists = () => {
     };
     fetchQuestsAndTasks();
   }, []);
+  const handleUpdateTaskStatus = async (
+    taskId: string,
+    currentStatus: string
+  ) => {
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
 
+    await updateTaskStatus(taskId, "Inactive");
+    setQuests((prevQuests) =>
+      prevQuests.map((quest) => ({
+        ...quest,
+        tasks: quest.tasks.map((task) =>
+          task.id === taskId ? { ...task, status: newStatus } : task
+        ),
+      }))
+    );
+  };
   return (
     <div>
       <div className="flex gap-4 items-center flex-col sm:flex-row">
@@ -175,7 +193,7 @@ const QuestLists = () => {
         <p>{error}</p>
       ) : (
         <div>
-          {quests.map((quest, el) => (
+          {quests.map((quest) => (
             <div
               key={quest.id}
               className="quest-item bg-slate-50 text-sky-900 my-2 flex flex-col rounded-lg"
@@ -183,7 +201,7 @@ const QuestLists = () => {
               <div className="text-xl font-bold border-2	 rounded-lg border-slate-300 px-1 py-2 bg-orange-100 flex justify-between align-middle">
                 <h2>
                   {quest.title}{" "}
-                  <span className="flex justify-between p-1">{el}</span>
+                  {/* <span className="flex justify-between p-1">{el}</span> */}
                 </h2>
                 <button
                   className=" bg-red-500 hover:bg-red-700 text-white font-bold py-0 px-2 rounded"
@@ -197,7 +215,8 @@ const QuestLists = () => {
                   <TaskItem
                     key={task.id}
                     task={task}
-                    tasks={quest.tasks}
+                    // tasks={quest.tasks}
+                    onToggleStatus={handleUpdateTaskStatus}
                     onDelete={handleDeleteTask}
                   />
                 ))

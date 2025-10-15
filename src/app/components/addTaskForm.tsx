@@ -6,10 +6,12 @@ import Task from "../models/task";
 
 export default function AddTaskForm({
   questId,
+  parentId,
   onAddTask,
 }: {
   questId: string;
-  onAddTask: (questId: string, newTask: Task) => void;
+  parentId: string;
+  onAddTask: (questId: string, praentId: string, newTask: Task) => void;
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -22,13 +24,14 @@ export default function AddTaskForm({
 
     const newTask = await createTask(
       questId,
+      parentId,
       title,
       description,
       status,
       value
     );
     if (newTask) {
-      onAddTask(questId, newTask);
+      onAddTask(questId, parentId, newTask);
       setTitle("");
       setDescription("");
       setStatus("Active");
@@ -37,7 +40,12 @@ export default function AddTaskForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2 mt-2">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-2 mt-2"
+      data-testid="add-task-form"
+    >
+      <h2>FORM</h2>
       <input
         type="text"
         value={title}

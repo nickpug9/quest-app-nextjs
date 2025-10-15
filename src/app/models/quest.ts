@@ -1,6 +1,6 @@
-import { Task } from "../models/task";
+import Task from "../models/task";
 // import {IndexableType} from "dexie";
-export interface Quest {
+export default interface Quest {
   id: string;
   title: string;
   description?: string;
